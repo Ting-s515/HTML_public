@@ -21,7 +21,7 @@ def save_member_to_sql(data):
     )
     cursor = conn.cursor()
     cursor.execute('''
-        INSERT INTO register (name, email, password, phone)
+        INSERT INTO 客戶資料 (姓名, 信箱, 密碼, 手機)
         VALUES (?, ?, ?, ?)
     ''', (data['name'], data['email'], data['password'], data['phone']))
     conn.commit()
@@ -38,7 +38,7 @@ def user_information(email, password):
     #查詢資料庫用戶資料
     cursor = conn.cursor()
     cursor.execute('''
-        SELECT * FROM register WHERE email = ? AND password = ?
+        SELECT * FROM 客戶資料 WHERE 信箱 = ? AND 密碼 = ?
     ''', (email, password))
     user_row = cursor.fetchone()
     conn.close()
