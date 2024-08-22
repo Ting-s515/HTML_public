@@ -101,6 +101,39 @@ def login():
         # 登錄失敗，返回錯誤消息
         return jsonify({'status': 'error', 'message': '登入失敗，請檢查您的帳號或密碼。'}), 401
 
+# 定義重設密碼功能
+@app.route("/resetPassword",methods=['GET'])
+def reset_page():
+    return render_template('resetPassword.html') 
+#POST   
+@app.route('/resetPassword',methods=['POST'])
+def reset_password():
+    data=request.get_json()
+    email=data.get('email')
+    new_password=data.get('new_password')
+    print('email= ',email)
+    print('new_password= ',new_password)
+    conn = pyodbc.connect(
+        'DRIVER={SQL Server};'
+        'SERVER=172.18.9.251;'
+        'DATABASE=用戶註冊;'
+        'UID=sa;'
+        'PWD=12345'
+    )
+    cursor = conn.cursor()
+    cursor.execute('SELECT * FROM 客戶資料 WHERE 信箱 = ?', (email,))
+    user_row = cursor.fetchone()
+    if not user_row:
+        return jsonify({'status': 'error', 'message': '未找到該信箱對應的用戶。'})
+
+    cursor.execute('''
+        UPDATE 客戶資料 SET 密碼=? WHERE 信箱=?
+    ''',(new_password,email))
+    print('UPDATE pwd= ',new_password)
+    conn.commit()
+    conn.close()
+    return jsonify({'status': 'success', 'message': '密碼已成功重設！'})
+
 # 定義會員登出功能
 @app.route('/logout')
 def logout():
