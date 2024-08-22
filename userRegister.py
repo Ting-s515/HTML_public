@@ -1,3 +1,4 @@
+#每一個網頁分別做一個route，GET POST要分開做
 from flask import Flask, render_template, jsonify, request,session,redirect
 import pyodbc
 
@@ -10,11 +11,11 @@ app.secret_key = 'P@ssw@rd' #為了安全性，這個密鑰應該設置得複雜
 # users = {
 #     'ted@gmail.com': 'qwe123'
 # }
-# 連接到 SQL Server 的函數
+# 定義建構子連接到 SQL Server 的函數
 def save_member_to_sql(data):
     conn = pyodbc.connect(
         'DRIVER={SQL Server};'
-        'SERVER=172.17.100.209;'
+        'SERVER=172.18.9.251;'
         'DATABASE=用戶註冊;'
         'UID=sa;'
         'PWD=12345'
@@ -26,11 +27,11 @@ def save_member_to_sql(data):
     ''', (data['name'], data['email'], data['password'], data['phone']))
     conn.commit()
     conn.close()
-#獲取用戶的email password
+#定義建構子獲取用戶的email password
 def user_information(email, password):
     conn = pyodbc.connect(
         'DRIVER={SQL Server};'
-        'SERVER=172.17.100.209;'
+        'SERVER=172.18.9.251;'
         'DATABASE=用戶註冊;'
         'UID=sa;'
         'PWD=12345'
@@ -40,33 +41,40 @@ def user_information(email, password):
     cursor.execute('''
         SELECT * FROM 客戶資料 WHERE 信箱 = ? AND 密碼 = ?
     ''', (email, password))
-    user_row = cursor.fetchone()
+    user_row = cursor.fetchone() #fetchone() 方法從查詢結果中獲取第一行數據
+    #user_row 是一個元組，print '+' 運算符不能直接將str和元組tuple拼接。
+    print('user row= ',user_row)
     conn.close()
     if user_row:
     # 将 Row 对象转换为字典
+        #抓第一欄(column)
         columns = [column[0] for column in cursor.description]
-        user = dict(zip(columns, user_row))
+        print('columns= ',columns)
+        user = dict(zip(columns, user_row))#user字典(key,value)
+        print('user dict= ',user)
         return user
     return None
 
 # 定義根路徑顯示首頁
 @app.route('/')
 def index():
-      # 從 session 中獲取用戶資訊
+    # 從 session 中獲取用戶資訊，一個用來存儲特定用戶數據的字典，
+    #它的數據在整個用戶登入期間保持有效，即使在不同頁面之間切換  
     user = session.get('user') 
+    #用來讀取或獲取已經存儲在 session 中的數據。Flask會找 session 中是否有名為 'user' 的鍵
     return render_template('citybreak.html', user=user)
 
 # 定義路由來顯示會員註冊頁面
-@app.route('/userRegister', methods=['GET'])
+@app.route('/userRegister', methods=['GET']) #GET: 用於從資料庫獲取數據。
 def register_page():
-    return render_template('userRegister.html')
+    return render_template('userRegister.html') 
 # 定義路由來處理會員註冊
-@app.route('/userRegister', methods=['POST'])
+@app.route('/userRegister', methods=['POST'])# POST: 用於將數據發送到服務器來創建或更新資源。
 def register():
-    data = request.get_json()
+    data = request.get_json()#從前端接收到的 HTTP 請求中獲取 JSON 格式的數據
     try:
-        save_member_to_sql(data)
-        return jsonify({'status': 'success'}), 200
+        save_member_to_sql(data) 
+        return jsonify({'status': 'success'}), 200#返回一個 JSON 格式的響應，其中包含狀態 status: 'success'
     except Exception as e:
         return jsonify({'status': 'error', 'message': str(e)}), 500
 
@@ -84,7 +92,10 @@ def login():
     if user:
         # 登錄成功，返回JSON响应
         # 設置 session 並返回成功消息
-        session['user'] = user
+        session['user'] = user 
+        print('session_user= ',session['user'])
+        #是用來設定或儲存數據到 session 中。在 session 中創建一個名為 'user' 的鍵，
+        # #並將user的值存在這個鍵中。(key value)
         return jsonify({'status': 'success'}), 200
     else:
         # 登錄失敗，返回錯誤消息
