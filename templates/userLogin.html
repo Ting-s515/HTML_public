@@ -98,6 +98,9 @@
     </div>
     
     <script>
+        // 1.抓表單元素，添加監聽事件
+        //2.宣告變數，存放表單資料
+        //3.http請求，fetch('route')
          document.getElementById('loginForm').addEventListener('submit', function(e) {
             e.preventDefault(); // 防止表單提交刷新頁面
 
@@ -105,15 +108,20 @@
                 email: document.getElementById('email').value,
                 password: document.getElementById('password').value
             };
-
+             //fetch 函數用來向指定的 URL (/userLogin) 發送 HTTP 請求。
             fetch('/userLogin', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
+                //body 屬性用來設定請求的主體（即要發送的數據）。
+                //JSON.stringify(obj)) 將物件轉換成 JSON 字符串格式，以便發送到服務器。data 是要發送到服務器的數據。
                 body: JSON.stringify(data)
             })
+             //response 是服務器回應對象。
+            //response.json() 是一個方法，它將回應轉換成 JSON 格式。
             .then(response => response.json())
+             //.then() 方法返回一個新的 Promise，這個 Promise 會解析為 JSON 格式的數據（即 data）。
             .then(data => {
                 if (data.status === 'success') {
                     alert("登入成功");
@@ -122,6 +130,7 @@
                     alert(data.message);
                 }
             })
+            //.catch() 是 Promise 的一個方法，用於捕獲和處理在.then() 調用中發生的異常或錯誤。
             .catch(error => {
                 console.error('Error:', error);
             });
