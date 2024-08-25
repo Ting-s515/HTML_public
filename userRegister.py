@@ -15,7 +15,7 @@ app.secret_key = 'P@ssw@rd' #為了安全性，這個密鑰應該設置得複雜
 def save_member_to_sql(data):
     conn = pyodbc.connect(
         'DRIVER={SQL Server};'
-        'SERVER=172.18.9.251;'
+        'SERVER=172.27.228.117;'
         'DATABASE=用戶註冊;'
         'UID=sa;'
         'PWD=12345'
@@ -31,7 +31,7 @@ def save_member_to_sql(data):
 def user_information(email, password):
     conn = pyodbc.connect(
         'DRIVER={SQL Server};'
-        'SERVER=172.18.9.251;'
+        'SERVER=172.27.228.117;'
         'DATABASE=用戶註冊;'
         'UID=sa;'
         'PWD=12345'
@@ -115,7 +115,7 @@ def reset_password():
     print('new_password= ',new_password)
     conn = pyodbc.connect(
         'DRIVER={SQL Server};'
-        'SERVER=172.18.9.251;'
+        'SERVER=172.27.228.117;'
         'DATABASE=用戶註冊;'
         'UID=sa;'
         'PWD=12345'
