@@ -27,12 +27,13 @@
             {% if 'user' in session %}
             <span class="text-userlogin">{{session['user']['姓名'] }} 您好</span>
             <a href="/logout" class="text-userout">登出</a>
-            <a href="#" class="text-decoration-none shoppingcart-icon"><i class="fa-solid fa-shopping-cart"></i>
-            <!-- 購物車數量 -->
-            <span class="cart-count" class="badge bg-secondary">0</span></a>
+          
             {% else %}
             <a href="/userLogin" class="text-decoration-none"><i class="fa-solid fa-user member-icon"></i></a>
             {% endif %}
+            <a href="#" class="text-decoration-none shoppingcart-icon"><i class="fa-solid fa-shopping-cart"></i>
+                <!-- 購物車數量 -->
+                <span class="cart-count" class="badge bg-secondary">0</span></a>
         </div>
     </div>
 
@@ -81,12 +82,13 @@
                     {% if 'user' in session %}
                     <span class="text-userlogin">{{session['user']['姓名'] }} 您好</span>
                     <a href="/logout" class="text-userout">登出</a>
-                    <a href="#" class="text-decoration-none"><i class="fa-solid fa-shopping-cart sm-shoppingcart-icon"></i>
-                     <!-- badge更新圖示數量 -->
-                    <span class="cart-count badge bg-secondary">0</span></a>
+                 
                     {% else %}
                     <a href="/userLogin" class="text-decoration-none me-2"><i class="fa-solid fa-user sm-member-icon"></i></a>
                     {% endif %}   
+                    <a href="#" class="text-decoration-none"><i class="fa-solid fa-shopping-cart sm-shoppingcart-icon"></i>
+                        <!-- badge更新圖示數量 -->
+                       <span class="cart-count badge bg-secondary">0</span></a>
                 </div>
             </div>
         </div>
