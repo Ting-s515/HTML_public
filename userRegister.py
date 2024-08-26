@@ -186,9 +186,9 @@ def outdoor_litems():
     return render_template('outdoor_litems.html')
 
 # 定義路徑來顯示 clothes.html
-@app.route('/equipment裝備')
+@app.route('/equipment')
 def equipment():
-    return render_template('equipment裝備.html') 
+    return render_template('equipment.html') 
 
 @app.route('/search_result')
 def search_result():
