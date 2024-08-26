@@ -7,49 +7,46 @@ app = Flask(__name__)
 app.config['TEMPLATES_AUTO_RELOAD'] = True #每次刷新session
 # 要留著
 app.secret_key = 'P@ssw@rd' #為了安全性，這個密鑰應該設置得複雜且難以猜測
-#模擬的用戶資料
-# users = {
-#     'ted@gmail.com': 'qwe123'
-# }
-# 定義建構子連接到 SQL Server 的函數
-def save_member_to_sql(data):
+def sql_connect():
     conn = pyodbc.connect(
         'DRIVER={SQL Server};'
-        'SERVER=172.27.228.117;'
+        'SERVER=172.22.220.207;'
         'DATABASE=用戶註冊;'
         'UID=sa;'
         'PWD=12345'
     )
-    cursor = conn.cursor()
+     # 返回 cursor 物件，用於執行 SQL 語句
+    return conn.cursor()
+# 定義建構子連接到 SQL Server 的函數
+def save_member_to_sql(data):
+    cursor=sql_connect() # 調用方法獲取 cursor
+    print('data= ',data)#前端傳送json
     cursor.execute('''
         INSERT INTO 客戶資料 (姓名, 信箱, 密碼, 手機)
         VALUES (?, ?, ?, ?)
     ''', (data['name'], data['email'], data['password'], data['phone']))
-    conn.commit()
-    conn.close()
+    #data={'key':'value','key':'value','key':'value','key':'value'}
+    print(data['name'], data['email'], data['password'], data['phone'])
+    cursor.commit()
+    cursor.close()
 #定義建構子獲取用戶的email password
 def user_information(email, password):
-    conn = pyodbc.connect(
-        'DRIVER={SQL Server};'
-        'SERVER=172.27.228.117;'
-        'DATABASE=用戶註冊;'
-        'UID=sa;'
-        'PWD=12345'
-    )
     #查詢資料庫用戶資料
-    cursor = conn.cursor()
+    cursor = sql_connect()
     cursor.execute('''
         SELECT * FROM 客戶資料 WHERE 信箱 = ? AND 密碼 = ?
     ''', (email, password))
+    # 獲取第一列的資料
+    columns = [column[0] for column in cursor.description]
+    print('columns= ',columns)
     user_row = cursor.fetchone() #fetchone() 方法從查詢結果中獲取第一行數據
-    #user_row 是一個元組，print '+' 運算符不能直接將str和元組tuple拼接。
+    # 在fetchone() 之前調用cursor.description 來取得column的資訊，然後將其儲存到 columns 列表中。
+    # 這樣在關閉 cursor 之前可以正確存取列名稱。
+    #user_row 是一個元組，'+' 運算符不能直接將str和元組tuple拼接。
     print('user row= ',user_row)
-    conn.close()
+    cursor.close()
     if user_row:
     # 将 Row 对象转换为字典
-        #抓第一欄(column)
-        columns = [column[0] for column in cursor.description]
-        print('columns= ',columns)
         user = dict(zip(columns, user_row))#user字典(key,value)
         print('user dict= ',user)
         return user
@@ -74,7 +71,8 @@ def register():
     data = request.get_json()#從前端接收到的 HTTP 請求中獲取 JSON 格式的數據
     try:
         save_member_to_sql(data) 
-        return jsonify({'status': 'success'}), 200#返回一個 JSON 格式的響應，其中包含狀態 status: 'success'
+        return jsonify({'status': 'success'}), 200
+    #返回一個 JSON 格式的響應，其中包含狀態 status: 'success'
     except Exception as e:
         return jsonify({'status': 'error', 'message': str(e)}), 500
 
@@ -88,6 +86,7 @@ def login():
     data = request.get_json()  # 从JSON请求中获取数据
     email = data.get('email')
     password = data.get('password')
+    cursor=sql_connect()
     user = user_information(email, password)
     if user:
         # 登錄成功，返回JSON响应
@@ -113,14 +112,7 @@ def reset_password():
     new_password=data.get('new_password')
     print('email= ',email)
     print('new_password= ',new_password)
-    conn = pyodbc.connect(
-        'DRIVER={SQL Server};'
-        'SERVER=172.27.228.117;'
-        'DATABASE=用戶註冊;'
-        'UID=sa;'
-        'PWD=12345'
-    )
-    cursor = conn.cursor()
+    cursor = sql_connect()
     cursor.execute('SELECT * FROM 客戶資料 WHERE 信箱 = ?', (email,))
     user_row = cursor.fetchone()
     if not user_row:
@@ -130,8 +122,8 @@ def reset_password():
         UPDATE 客戶資料 SET 密碼=? WHERE 信箱=?
     ''',(new_password,email))
     print('UPDATE pwd= ',new_password)
-    conn.commit()
-    conn.close()
+    cursor.commit()
+    cursor.close()
     return jsonify({'status': 'success', 'message': '密碼已成功重設！'})
 
 # 定義會員登出功能
@@ -144,6 +136,34 @@ def logout():
 
 # return render_template('citybreak.html'): 這會直接返回 citybreak.html 頁面的內容，
 # 而不改變瀏覽器的 URL。這對於重新渲染當前頁面或在某些情況下直接顯示頁面內容是有效的
+
+#搜尋
+@app.route('/search_result', methods=['GET'])
+def search_products():
+    search_text = request.args.get('search', '')
+    print('搜尋: ', search_text)
+    if not search_text:
+        return render_template('search_result.html', results=[],search_text='無此關鍵字')
+    cursor = sql_connect()
+    cursor.execute('''
+        SELECT 商品名稱, 價格,圖片路徑,商品介紹
+        FROM 商品資料 
+        WHERE 商品名稱 LIKE ?
+    ''', (f'%{search_text}%',))
+    items = cursor.fetchall()
+    print('fetchall_items= ',items)
+    results = []
+    for item in items:
+        results.append({                                
+            'name': item[0],
+            'price': item[1],
+            'image_url': item[2],
+            'product_introduction': item[3]  # 商品介紹
+        })
+
+    cursor.close()
+    return render_template('search_result.html', results=results,search_text=search_text)
+    #把results,search_text 結果返回給前端使用
 
 # 定義路由來顯示 citybreak 頁面
 @app.route('/citybreak')
@@ -169,6 +189,10 @@ def outdoor_litems():
 @app.route('/equipment裝備')
 def equipment():
     return render_template('equipment裝備.html') 
-   
+
+@app.route('/search_result')
+def search_result():
+    return render_template('search_result.html') 
+
 if __name__ == '__main__':
     app.run(debug=True)

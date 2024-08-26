@@ -5,12 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CityBreak Outdoor Store</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="{{ url_for('static', filename='cart分頁通用.css') }}" type="text/css"> 
     <!-- 引入 Font Awesome -->
     <script src="https://kit.fontawesome.com/bdc270b58a.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
-    <script src="{{ url_for('static', filename='cart通用.js') }}"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='general_cart.css') }}" type="text/css"> 
+    <script src="{{ url_for('static', filename='general_cart.js') }}"></script>
+    <script src="{{ url_for('static', filename='search_form.js') }}"></script>
 </head>
 <body>
     <div class="logo-container">
@@ -27,12 +28,15 @@
             {% if 'user' in session %}
             <span class="text-userlogin">{{session['user']['姓名'] }} 您好</span>
             <a href="/logout" class="text-userout">登出</a>
-            {% else %}
-            <a href="/userLogin" class="text-decoration-none"><i class="fa-solid fa-user member-icon"></i></a>
-            {% endif %}
             <a href="#" class="text-decoration-none shoppingcart-icon"><i class="fa-solid fa-shopping-cart"></i>
                 <!-- 購物車數量 -->
                 <span class="cart-count" class="badge bg-secondary">0</span></a>
+            {% else %}
+            <a href="/userLogin" class="text-decoration-none"><i class="fa-solid fa-user member-icon"></i></a>
+            <a href="#" class="text-decoration-none shoppingcart-icon"><i class="fa-solid fa-shopping-cart"></i>
+                <!-- 購物車數量 -->
+                <span class="cart-count" class="badge bg-secondary">0</span></a>
+            {% endif %}
         </div>
     </div>
 
@@ -45,6 +49,14 @@
                 <li><a href="/outdoor_litems">戶外生活</a></li>
                 <li><a href="/equipment裝備">器材裝備</a></li>
             </ul>
+             <!-- 電腦板搜尋 -->
+             <form class="d-flex search_Form" role="search" action="/search_result" method="GET">
+                <input class="form-control me-2 search-col search_Input" type="search" 
+                placeholder="Search" aria-label="Search" name="search">
+                <button class="btn btn-outline-success search-btn" type="submit">
+                    <i class="fa-solid fa-magnifying-glass"></i> <!-- search icon -->
+                </button>    
+            </form>
         </nav>
     </div>
 
@@ -75,18 +87,31 @@
                     <li class="nav-item">
                         <a class="nav-link" href="/equipment裝備">器材裝備</a>
                     </li>
+                    <li class="nav-item d-block d-md-none">
+                        <!-- 手機板搜尋 -->
+                        <form class="d-flex sm-search-form search_Form" role="search" action="/search_result" method="GET">
+                            <input class="form-control sm-search-col search_Input" type="search" 
+                            placeholder="Search" aria-label="Search" name="search">
+                            <button class="btn sm-search-btn" type="submit">
+                                <i class="fa-solid fa-magnifying-glass seacch-icon" ></i> <!-- search icon -->
+                            </button>
+                        </form>
+                    </li>
                 </ul>
                   <!-- 手機版會員和購物車圖示 -->
                 <div class="d-md-none ml-auto">
                     {% if 'user' in session %}
                     <span class="text-userlogin">{{session['user']['姓名'] }} 您好</span>
                     <a href="/logout" class="text-userout">登出</a>
-                    {% else %}
-                    <a href="/userLogin" class="text-decoration-none me-2"><i class="fa-solid fa-user sm-member-icon"></i></a>
-                    {% endif %}   
                     <a href="#" class="text-decoration-none"><i class="fa-solid fa-shopping-cart sm-shoppingcart-icon"></i>
                         <!-- badge更新圖示數量 -->
                        <span class="cart-count badge bg-secondary">0</span></a>
+                    {% else %}
+                    <a href="/userLogin" class="text-decoration-none me-2"><i class="fa-solid fa-user sm-member-icon"></i></a>
+                    <a href="#" class="text-decoration-none"><i class="fa-solid fa-shopping-cart sm-shoppingcart-icon"></i>
+                        <!-- badge更新圖示數量 -->
+                       <span class="cart-count badge bg-secondary">0</span></a>
+                    {% endif %}   
                 </div>
             </div>
         </div>
@@ -180,7 +205,7 @@
             </div>
             <div class="col-6  col-lg-3 d-flex justify-content-center card-space">         
                 <div class="card" style="width: 18rem;">
-                    <img src="../static/image/運動服男.jpg" class="card-img-top" alt="商品圖片">
+                    <img src="../static/image/運動服女.jpg" class="card-img-top" alt="商品圖片">
                     <div class="card-body">
                     <h5 class="card-title">女運動服</h5>
                     <p class="card-text">舒適透氣，兼具運動與休閒風格，日常穿著必備。</p>
@@ -191,7 +216,7 @@
             </div>
             <div class="col-6  col-lg-3 d-flex justify-content-center card-space">         
                 <div class="card" style="width: 18rem;">
-                    <img src="../static/image/運動服女.jpg" class="card-img-top" alt="商品圖片">
+                    <img src="../static/image/運動服男.jpg" class="card-img-top" alt="商品圖片">
                     <div class="card-body">
                     <h5 class="card-title">男運動服</h5>
                     <p class="card-text">舒適透氣，兼具運動與休閒風格，日常穿著必備。</p>

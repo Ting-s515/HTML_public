@@ -31,18 +31,18 @@ document.addEventListener('DOMContentLoaded', function () {
         cartPopup.style.display = 'none';
     });
 
-     // 清除購物車
-     //檢查元素是否存在 true 
-    //  if (clearCartButton) {
-    //     clearCartButton.addEventListener('click', function() {
-    //         cart = []; // 清空購物車陣列
-    //         //removeItem 是 localStorage 的內建方法
-    //         localStorage.removeItem('cart'); // 從 localStorage 中移除購物車
-    //         updateCart(); // 更新購物車
-    //     });
-    // }
+//      // 清除購物車
+//      //檢查元素是否存在 true 
+//      if (clearCartButton) {
+//         clearCartButton.addEventListener('click', function() {
+//             cart = []; // 清空購物車陣列
+//             //removeItem 是 localStorage 的內建方法
+//             localStorage.removeItem('cart'); // 從 localStorage 中移除購物車
+//             updateCart(); // 更新購物車
+//         });
+//     }
 
-    // 添加商品到購物車 add-to-cart 遍歷每個button
+//     // 添加商品到購物車 add-to-cart 遍歷每個button
 //     document.querySelectorAll('.add-to-cart').forEach(button => {
 //         button.addEventListener('click', function(event) {
 //             event.preventDefault();
